@@ -12,7 +12,6 @@ class ProcessInfo : public QObject
     Q_PROPERTY(ProcessId pid READ pid CONSTANT)
     Q_PROPERTY(ProcessId ppid READ ppid CONSTANT)
     Q_PROPERTY(QString name READ name NOTIFY nameChanged)
-    Q_PROPERTY(qint64 memory READ memory NOTIFY memoryChanged)
     Q_PROPERTY(qint64 nrVoluntarySwitches READ nrVoluntarySwitches NOTIFY nrVoluntarySwitchesChanged)
     Q_PROPERTY(qint64 nrInvoluntarySwitches READ nrInvoluntarySwitches NOTIFY nrInvoluntarySwitchesChanged)
     Q_PROPERTY(qint64 activePulseStreams READ activePulseStreams NOTIFY activePulseStreamsChanged)
@@ -30,7 +29,6 @@ public:
     ProcessId pid() const { return m_pid; }
     ProcessId ppid() const { return m_ppid; }
     QString name() const { return m_name; }
-    qint64 memory() const { return m_memory; }
     qint64 nrVoluntarySwitches() const { return m_nrVoluntarySwitches; }
     qint64 nrInvoluntarySwitches() const { return m_nrInvoluntarySwitches; }
     qint64 activePulseStreams() const { return m_activePulseStreams; }
@@ -43,7 +41,6 @@ public:
 
 signals:
     void nameChanged();
-    void memoryChanged();
     void nrVoluntarySwitchesChanged();
     void nrInvoluntarySwitchesChanged();
     void activePulseStreamsChanged();
@@ -55,12 +52,9 @@ private:
     // /proc
     ProcessId m_pid = 0;
 
-    // /proc/pid/stat
+    // /proc/pid/status
     QString m_name;
     ProcessId m_ppid = 0;
-
-    // /proc/pid/status
-    qint64 m_memory = 0;
     qint64 m_nrVoluntarySwitches = 0;
     qint64 m_lastnrVoluntarySwitches = 0;
     qint64 m_nrInvoluntarySwitches = 0;
@@ -83,18 +77,16 @@ public:
     ProcessModel(QObject *parent = nullptr);
     void gatherInfo();
 
-    Q_INVOKABLE ProcessInfo* processAtRow(int rowNumber) { if (rowNumber < 0 || rowNumber >= m_processes.size()) return nullptr; return m_processes.at(rowNumber); }
-
 protected:
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     QHash<int, QByteArray> roleNames() const override;
 
     enum class Role {
+        ProcessInfoObject,
         PID,
         PPID,
         Name,
-        Memory,
         NrVoluntarySwitches,
         NrInvoluntarySwitches,
         ActivePulseStreams,

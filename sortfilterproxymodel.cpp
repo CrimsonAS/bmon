@@ -77,7 +77,7 @@ QJSValue SortFilterProxyModel::get(int idx) const
         QHashIterator<int, QByteArray> it(roles);
         while (it.hasNext()) {
             it.next();
-            value.setProperty(QString::fromUtf8(it.value()), data(index(idx, 0), it.key()).toString());
+            value.setProperty(QString::fromUtf8(it.value()), engine->toScriptValue(data(index(idx, 0), it.key())));
         }
     }
     return value;

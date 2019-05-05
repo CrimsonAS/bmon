@@ -15,6 +15,7 @@ QQC1.ApplicationWindow {
         id: tableView
 
         model: SortFilterProxyModel {
+            id: sortFilterProxyModel
             source: processModel
             sortOrder: tableView.sortIndicatorOrder
             sortCaseSensitivity: Qt.CaseInsensitive
@@ -45,7 +46,8 @@ QQC1.ApplicationWindow {
             Text {
                 anchors.verticalCenter: parent.verticalCenter
                 color: {
-                    var process = processModel.processAtRow(styleData.row);
+                    var row = sortFilterProxyModel.get(styleData.row);
+                    var process = row.processInfoObject;
 
                     if (process && process.live) {
                         return styleData.textColor;

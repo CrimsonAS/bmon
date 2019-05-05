@@ -62,9 +62,6 @@ bool ProcessInfo::gatherStatus()
 
     m_ppid = kv["PPid"].toInt();
 
-    m_memory = kv["VmRSS"].split(" ")[0].toInt();
-    emit memoryChanged();
-
     m_lastnrVoluntarySwitches = m_nrVoluntarySwitches;
     m_nrVoluntarySwitches = kv["voluntary_ctxt_switches"].toInt();
     if (m_lastnrVoluntarySwitches == 0) {
@@ -251,10 +248,10 @@ int ProcessModel::rowCount(const QModelIndex &parent) const
 QHash<int, QByteArray> ProcessModel::roleNames() const
 {
     QHash<int, QByteArray> roles;
+    roles.insert(int(Role::ProcessInfoObject), "processInfoObject");
     roles.insert(int(Role::PID), "pid");
     roles.insert(int(Role::PPID), "ppid");
     roles.insert(int(Role::Name), "name");
-    roles.insert(int(Role::Memory), "memory");
     roles.insert(int(Role::NrVoluntarySwitches), "nrVoluntarySwitches");
     roles.insert(int(Role::NrInvoluntarySwitches), "nrInvoluntarySwitches");
     roles.insert(int(Role::ActivePulseStreams), "activePulseStreams");
@@ -266,6 +263,9 @@ QHash<int, QByteArray> ProcessModel::roleNames() const
 QVariant ProcessModel::data(const QModelIndex &index, int role) const
 {
     switch (role) {
+    case int(Role::ProcessInfoObject):
+        return QVariant::fromValue(m_processes.at(index.row()));
+        break;
     case int(Role::PID):
         return m_processes.at(index.row())->pid();
         break;
@@ -274,9 +274,6 @@ QVariant ProcessModel::data(const QModelIndex &index, int role) const
         break;
     case int(Role::Name):
         return m_processes.at(index.row())->name();
-        break;
-    case int(Role::Memory):
-        return m_processes.at(index.row())->memory();
         break;
     case int(Role::NrVoluntarySwitches):
         return m_processes.at(index.row())->nrVoluntarySwitches();
